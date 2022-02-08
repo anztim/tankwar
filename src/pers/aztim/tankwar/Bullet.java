@@ -5,10 +5,18 @@ public class Bullet extends MovableElement implements Runnable {
     public static final int BULLET_SIZE_Y = 4;
 
     private final Identity identity;
+    private final Tank host;
 
-    public Bullet(int x, int y, Direction direction, int speed,Identity identity) {
+    public Bullet(int x, int y, Direction direction, int speed,Identity identity, Tank host) {
         super(x, y, BULLET_SIZE_X, BULLET_SIZE_Y, direction, speed);
         this.identity = identity;
+        this.host = host;
+    }
+
+    @Override
+    public void kill() {
+        super.kill();
+        host.removeBullet(this);
     }
 
     @Override

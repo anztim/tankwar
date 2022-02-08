@@ -170,8 +170,10 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
                 break;
             case KeyEvent.VK_J:
                 Bullet bullet = players.get(0).fire();
-                allyBullets.add(bullet);
-                new Thread(bullet).start();
+                if(bullet != null){
+                    allyBullets.add(bullet);
+                    new Thread(bullet).start();
+                }
                 break;
 
         }

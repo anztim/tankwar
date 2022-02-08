@@ -2,7 +2,7 @@ package pers.aztim.tankwar;
 
 public class Enemy extends Tank implements Runnable {
     public Enemy(int x, int y) {
-        super(x, y, Identity.ENEMY);
+        super(x, y, Identity.ENEMY,1);
         this.setDirection(Direction.DOWN);
     }
 

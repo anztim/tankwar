@@ -1,15 +1,21 @@
 package pers.aztim.tankwar;
 
+import java.util.Vector;
+
 public class Tank extends MovableElement {
     public static final int TANK_SIZE_X = 60;
     public static final int TANK_SIZE_Y = 60;
 
     private final Identity identity;
+    private final int bulletCapacity;
+    private final Vector<Bullet> bullets;
     private int bulletSpeed = 15;
 
-    public Tank(int x, int y, Identity identity) {
+    public Tank(int x, int y, Identity identity, int bulletCapacity) {
         super(x, y, TANK_SIZE_X, TANK_SIZE_Y, Direction.UP, 3);
         this.identity = identity;
+        this.bulletCapacity = bulletCapacity;
+        bullets = new Vector<>();
     }
 
     @Override
@@ -21,6 +27,7 @@ public class Tank extends MovableElement {
     }
 
     public Bullet fire() {
+        if (bullets.size() >= bulletCapacity) return null;
         int genX = getX();
         int genY = getY();
         Direction genD = getDirection();
@@ -42,8 +49,14 @@ public class Tank extends MovableElement {
                 genY += (TANK_SIZE_Y - Bullet.BULLET_SIZE_Y) / 2;
                 break;
         }
-        return new Bullet(genX, genY, genD, bulletSpeed, identity);
+        Bullet bullet = new Bullet(genX, genY, genD, bulletSpeed, identity, this);
+        bullets.add(bullet);
+        return bullet;
 
+    }
+
+    public void removeBullet(Bullet bullet) {
+        this.bullets.remove(bullet);
     }
 
     public Identity getIdentity() {
