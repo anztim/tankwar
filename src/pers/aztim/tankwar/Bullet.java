@@ -1,0 +1,34 @@
+package pers.aztim.tankwar;
+
+public class Bullet extends MovableElement implements Runnable {
+    public static final int BULLET_SIZE_X = 4;
+    public static final int BULLET_SIZE_Y = 4;
+
+    private final Identity identity;
+
+    public Bullet(int x, int y, Direction direction, int speed,Identity identity) {
+        super(x, y, BULLET_SIZE_X, BULLET_SIZE_Y, direction, speed);
+        this.identity = identity;
+    }
+
+    @Override
+    public void run() {
+        while (this.isAlive()) {
+            try {
+                this.stepForward();
+            } catch (OutOfMap e) {
+                System.out.println(this + " touch " + e.direction + " at " + this.getX() + "," + this.getY());
+                this.kill();
+            }
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public Identity getIdentity() {
+        return identity;
+    }
+}
