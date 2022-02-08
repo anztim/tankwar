@@ -1,19 +1,15 @@
 package pers.aztim.tankwar;
 
-import java.util.Vector;
-
 public class Tank extends MovableElement {
     public static final int TANK_SIZE_X = 60;
     public static final int TANK_SIZE_Y = 60;
 
     private final Identity identity;
-    private final Vector<Bullet> bullets;
     private int bulletSpeed = 15;
 
     public Tank(int x, int y, Identity identity) {
         super(x, y, TANK_SIZE_X, TANK_SIZE_Y, Direction.UP, 3);
         this.identity = identity;
-        bullets = new Vector<>();
     }
 
     @Override
@@ -56,10 +52,6 @@ public class Tank extends MovableElement {
 
     public void setBulletSpeed(int bulletSpeed) {
         this.bulletSpeed = bulletSpeed;
-    }
-
-    public Vector<Bullet> getBullets() {
-        return bullets;
     }
 }
 
