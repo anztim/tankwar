@@ -216,7 +216,4 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
             }
         }
     }
-
-    private void cleanTank() {
-    }
 }
