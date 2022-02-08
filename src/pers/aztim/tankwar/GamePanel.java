@@ -29,14 +29,13 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
 
     public GamePanel() {
         players = new Vector<>();
-//        players.add(new Player(470, 550));
-        players.add(new Player(50, 200));
+        players.add(new Player(470, 550));
 
         enemies = new Vector<>();
         for (int i = 0; i < enemyNum; i++) {
             enemies.add(new Enemy(50 + i * 100, 20));
         }
-        for(Enemy enemy : enemies){
+        for (Enemy enemy : enemies) {
             new Thread(enemy).start();
         }
 
@@ -170,7 +169,7 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
                 break;
             case KeyEvent.VK_J:
                 Bullet bullet = players.get(0).fire();
-                if(bullet != null){
+                if (bullet != null) {
                     allyBullets.add(bullet);
                     new Thread(bullet).start();
                 }
@@ -190,6 +189,9 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
         while (true) {
             //判断是否有子弹命中目标
             this.checkDamage(allyBullets, enemies);
+            this.checkDamage(enemyBullets, players);
+            //尝试让敌方坦克发射一枚子弹
+            this.enemiesAutoFire();
             this.repaint();
             try {
                 Thread.sleep(50);
@@ -203,7 +205,7 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
         for (Bullet bullet : bullets) {
             for (Tank target : targets) {
                 //如果有子弹命中
-                if (MovableElement.isTouched(bullet, target)) {
+                if (target.isAlive() && MovableElement.isTouched(bullet, target)) {
                     //创建爆炸效果
                     Explosion explosion = new Explosion(bullet.getCenterX() - Explosion.EXPLOSION_SIZE_X / 2
                             , bullet.getCenterY() - Explosion.EXPLOSION_SIZE_Y);
@@ -213,6 +215,16 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
                     bullet.kill();
                     target.kill();
                 }
+            }
+        }
+    }
+
+    private void enemiesAutoFire() {
+        for (Tank enemy : enemies) {
+            Bullet bullet = enemy.fire();
+            if (bullet != null) {
+                enemyBullets.add(bullet);
+                new Thread(bullet).start();
             }
         }
     }
