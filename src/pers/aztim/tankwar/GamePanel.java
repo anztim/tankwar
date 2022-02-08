@@ -16,8 +16,8 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
         explosionImages[2] = Toolkit.getDefaultToolkit().getImage(Panel.class.getResource("/bomb_3.gif"));
     }
 
-    private final Vector<Tank> players;
-    private final Vector<Tank> enemies;
+    private final Vector<Player> players;
+    private final Vector<Enemy> enemies;
     private final Vector<Explosion> explosions;
     private final Vector<Bullet> allyBullets;
     private final Vector<Bullet> enemyBullets;
@@ -35,6 +35,9 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
         enemies = new Vector<>();
         for (int i = 0; i < enemyNum; i++) {
             enemies.add(new Enemy(50 + i * 100, 20));
+        }
+        for(Enemy enemy : enemies){
+            new Thread(enemy).start();
         }
 
         explosions = new Vector<>();
@@ -69,7 +72,7 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
 
     private void drawTank(Tank tank, Graphics g) {
         if (!tank.isAlive()) {
-            if(tank.getIdentity() == Identity.ENEMY) operatingVector.remove(tank);
+            if (tank.getIdentity() == Identity.ENEMY) operatingVector.remove(tank);
             return;
         }
         int x = tank.getX();

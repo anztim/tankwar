@@ -8,10 +8,13 @@ public abstract class MovableElement extends Element {
 
 
     public static class OutOfMap extends Exception {
+        MovableElement element;
         Direction direction;
 
-        public OutOfMap(Direction direction) {
+        public OutOfMap(MovableElement element, Direction direction) {
+            this.element = element;
             this.direction = direction;
+            System.out.println(element+ "touched "+direction +" edge");
         }
     }
 
@@ -23,7 +26,7 @@ public abstract class MovableElement extends Element {
     }
 
     public MovableElement(int x, int y, int sizeX, int sizeY, Direction direction, int speed) {
-        super(x, y, sizeX, sizeY,direction);
+        super(x, y, sizeX, sizeY, direction);
         this.speed = speed;
     }
 
@@ -33,9 +36,9 @@ public abstract class MovableElement extends Element {
     }
 
     public void stepForward() throws OutOfMap {
-        int nav = getDirection().value();
-        this.setX(this.getX()+NAVIGATION[nav + 1] * speed);
-        this.setY(this.getY()+NAVIGATION[nav] * speed);
+        int nav = getDirection().ordinal();
+        this.setX(this.getX() + NAVIGATION[nav + 1] * speed);
+        this.setY(this.getY() + NAVIGATION[nav] * speed);
         edgeCheck();
     }
 
@@ -47,19 +50,19 @@ public abstract class MovableElement extends Element {
         int maxY = getMaxY();
         if (x <= 0) {
             x = 0;
-            throw new OutOfMap(Direction.LEFT);
+            throw new OutOfMap(this,Direction.LEFT);
         }
         if (x >= maxX) {
             x = maxX;
-            throw new OutOfMap(Direction.RIGHT);
+            throw new OutOfMap(this,Direction.RIGHT);
         }
         if (y <= 0) {
             y = 0;
-            throw new OutOfMap(Direction.UP);
+            throw new OutOfMap(this,Direction.UP);
         }
         if (y >= maxY) {
             y = maxY;
-            throw new OutOfMap(Direction.DOWN);
+            throw new OutOfMap(this,Direction.DOWN);
         }
     }
 

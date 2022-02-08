@@ -1,21 +1,17 @@
 package pers.aztim.tankwar;
 
 public enum Direction {
-    UP(0), RIGHT(1), DOWN(2), LEFT(3);
+    UP, RIGHT, DOWN, LEFT;
 
-    private static final Direction[] directions = {UP,RIGHT,DOWN,LEFT};
-
-    private final int value;
-
-    Direction(int value) {
-        this.value = value;
+    private static Direction get(int i) {
+        return values()[i];
     }
 
-    public int value() {
-        return value;
+    public static Direction random() {
+        return get((int) (Math.random() * 4));
     }
 
-    public Direction get(int i){
-        return directions[i];
+    public Direction opposite() {
+        return get((this.ordinal() + 2) % 4);
     }
 }
