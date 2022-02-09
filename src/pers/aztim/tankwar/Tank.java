@@ -5,14 +5,13 @@ import java.util.Vector;
 public class Tank extends MovableElement {
     public static final int TANK_SIZE_X = 60;
     public static final int TANK_SIZE_Y = 60;
+    private static final Vector<Tank> allTanks = new Vector<>();;
     private static final TankMonitor TANK_MONITOR = TankMonitor.getTankMonitor();
 
     private static class TankMonitor implements Runnable {
         private static final TankMonitor tankMonitor = new TankMonitor();
-        private final Vector<Tank> allTanks;
 
         private TankMonitor() {
-            allTanks = new Vector<>();
             new Thread(this).start();
         }
 
