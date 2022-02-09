@@ -7,6 +7,13 @@ public class Enemy extends Tank implements Runnable {
     }
 
     @Override
+    public void kill() {
+        super.kill();
+        //Enemy 消亡时通知积分器加一
+        Recorder.instant().add();
+    }
+
+    @Override
     public void run() {
         while (this.isAlive()) {
             for (int i = 0; i < 30; ++i) {

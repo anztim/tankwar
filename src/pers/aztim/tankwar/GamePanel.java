@@ -72,23 +72,28 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
             if (!bullet.isAlive()) iterator.remove();
             else drawBullet(bullet, g);
         }
+        showInfo(g);
     }
 
     private void drawTank(Tank tank, Graphics g) {
-        int x = tank.getX();
-        int y = tank.getY();
-
+        Color color = null;
         //选择车体颜色
         switch (tank.getIdentity()) {
             case ALLY:
-                g.setColor(Color.GRAY);
+                color = Color.GRAY;
                 break;
             case ENEMY:
-                g.setColor(Color.ORANGE);
+                color = Color.ORANGE;
                 break;
         }
+
+        drawTank0(tank.getX(),tank.getY(),tank.getDirection(),color,Color.WHITE,g);
+    }
+
+    private void drawTank0(int x,int y,Direction direction,Color tankColor, Color weaponColor,Graphics g){
         //绘制车体
-        switch (tank.getDirection()) {
+        g.setColor(tankColor);
+        switch (direction) {
             case UP:
             case DOWN:
                 g.fill3DRect(x, y, 15, 60, true);
@@ -103,11 +108,11 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
                 break;
         }
 
-        g.setColor(Color.WHITE);
+        g.setColor(weaponColor);
         //绘制圆形炮台
         g.fillOval(x + 20, y + 20, 20, 20);
         //绘制炮管
-        switch (tank.getDirection()) {
+        switch (direction) {
             case UP:
                 g.fillRect(x + 28, y, 4, 30);
                 break;
@@ -138,6 +143,14 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
         g.drawImage(explosionImages[explosion.getLifeTime() / 3],
                 explosion.getX(), explosion.getY(),
                 Explosion.EXPLOSION_SIZE_X, Explosion.EXPLOSION_SIZE_Y, this);
+    }
+
+    public void showInfo(Graphics g) {
+        g.setColor(Color.BLACK);
+        g.setFont(new Font("宋体", Font.BOLD, 25));
+        g.drawString("累计击毁地方坦克", 1020, 30);
+        g.drawString(""+Recorder.instant().getRecord(),1100,100);
+        drawTank0(1020,60,Direction.UP,Color.ORANGE,Color.CYAN,g);
     }
 
 
