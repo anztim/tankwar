@@ -72,6 +72,12 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
             if (!bullet.isAlive()) iterator.remove();
             else drawBullet(bullet, g);
         }
+        iterator = explosions.iterator();
+        while (iterator.hasNext()){
+            Explosion explosion = (Explosion) iterator.next();
+            if(!explosion.isAlive()) iterator.remove();
+            else drawExplosion(explosion,g);
+        }
         showInfo(g);
     }
 
