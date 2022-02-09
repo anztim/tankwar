@@ -16,7 +16,7 @@ public class Bullet extends MovableElement implements Runnable {
     @Override
     public void kill() {
         super.kill();
-        host.removeBullet(this);
+        if(host != null && host.isAlive()) host.removeBullet(this);
     }
 
     @Override
