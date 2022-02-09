@@ -5,7 +5,10 @@ import java.util.Vector;
 public class Tank extends MovableElement {
     public static final int TANK_SIZE_X = 60;
     public static final int TANK_SIZE_Y = 60;
-    private static final Vector<Tank> allTanks = new Vector<>();;
+
+    private static final Vector<Tank> allTanks = new Vector<>();
+    public static Vector<Tank> getAllTanks() { return allTanks; }
+
     private static final TankMonitor TANK_MONITOR = TankMonitor.getTankMonitor();
 
     private static class TankMonitor implements Runnable {
