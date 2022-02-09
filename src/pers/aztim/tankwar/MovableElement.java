@@ -14,7 +14,6 @@ public abstract class MovableElement extends Element {
         public OutOfMap(MovableElement element, Direction direction) {
             this.element = element;
             this.direction = direction;
-            System.out.println(element+ "touched "+direction +" edge");
         }
     }
 
@@ -49,19 +48,19 @@ public abstract class MovableElement extends Element {
         int maxX = getMaxX();
         int maxY = getMaxY();
         if (x <= 0) {
-            x = 0;
+            this.setX(0);
             throw new OutOfMap(this,Direction.LEFT);
         }
         if (x >= maxX) {
-            x = maxX;
+            this.setX(maxX);
             throw new OutOfMap(this,Direction.RIGHT);
         }
         if (y <= 0) {
-            y = 0;
+            this.setY(0);
             throw new OutOfMap(this,Direction.UP);
         }
         if (y >= maxY) {
-            y = maxY;
+            this.setY(maxY);
             throw new OutOfMap(this,Direction.DOWN);
         }
     }

@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.Iterator;
 import java.util.Vector;
 
 public class GamePanel extends JPanel implements KeyListener, Runnable {
@@ -22,72 +23,131 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
     private final Vector<Bullet> allyBullets;
     private final Vector<Bullet> enemyBullets;
 
-    private Vector<?> operatingVector;
+    private boolean gameOver = false;
 
 
     private final int enemyNum = 6;
 
-    public GamePanel() {
+    public GamePanel(boolean recover) {
         players = new Vector<>();
-        players.add(new Player(470, 550));
-
         enemies = new Vector<>();
+
+        explosions = new Vector<>();
+        allyBullets = new Vector<>();
+        enemyBullets = new Vector<>();
+        if (!recover) newGame();
+    }
+
+    private void newGame() {
+        players.add(new Player(470, 550));
         for (int i = 0; i < enemyNum; i++) {
             enemies.add(new Enemy(50 + i * 100, 20));
         }
         for (Enemy enemy : enemies) {
             new Thread(enemy).start();
         }
+    }
 
-        explosions = new Vector<>();
-        allyBullets = new Vector<>();
-        enemyBullets = new Vector<>();
+    public void recover(Vector<? extends Tank> tanks, Vector<? extends Bullet> bullets) {
+        if (tanks != null) {
+            for (Tank tank : tanks) {
+                Tank.addToAllTanks(tank);
+                switch (tank.getIdentity()) {
+                    case ENEMY:
+                        enemies.add((Enemy) tank);
+                        break;
+                    case ALLY:
+                        players.add((Player) tank);
+                        break;
+                }
+            }
+        }
+        if (bullets != null) {
+            for (Bullet bullet : bullets) {
+                Bullet.addToAllBullets(bullet);
+                switch (bullet.getIdentity()) {
+                    case ENEMY:
+                        enemyBullets.add(bullet);
+                        break;
+                    case ALLY:
+                        allyBullets.add(bullet);
+                        break;
+                }
+            }
+        }
+        for (Enemy enemy : enemies) {
+            new Thread(enemy).start();
+        }
+        for (Bullet bullet : enemyBullets) {
+            new Thread(bullet).start();
+        }
+        for (Bullet bullet : allyBullets) {
+            new Thread(bullet).start();
+        }
+    }
+
+    public boolean isGameOver() {
+        return gameOver;
     }
 
     @Override
     public void paint(Graphics g) {
         super.paint(g);
         g.fillRect(0, 0, 1000, 750);//background
-        operatingVector = enemies;
-        for (Tank enemy : enemies) {
-            drawTank(enemy, g);
+        Iterator<?> iterator;
+        iterator = enemies.iterator();
+        while (iterator.hasNext()) {
+            Tank tank = (Tank) iterator.next();
+            if (!tank.isAlive()) iterator.remove();
+            else drawTank(tank, g);
         }
-        operatingVector = players;
-        for (Tank player : players) {
-            drawTank(player, g);
+        iterator = players.iterator();
+        while (iterator.hasNext()) {
+            Tank tank = (Tank) iterator.next();
+            if (!tank.isAlive()) iterator.remove();
+            else drawTank(tank, g);
         }
-        operatingVector = allyBullets;
-        for (Bullet bullet : allyBullets) {
-            drawBullet(bullet, g);
+        if (players.size() == 0) gameOver = true;
+        iterator = enemyBullets.iterator();
+        while (iterator.hasNext()) {
+            Bullet bullet = (Bullet) iterator.next();
+            if (!bullet.isAlive()) iterator.remove();
+            else drawBullet(bullet, g);
         }
-        operatingVector = enemyBullets;
-        for (Bullet bullet : enemyBullets) {
-            drawBullet(bullet, g);
+        iterator = allyBullets.iterator();
+        while (iterator.hasNext()) {
+            Bullet bullet = (Bullet) iterator.next();
+            if (!bullet.isAlive()) iterator.remove();
+            else drawBullet(bullet, g);
         }
-        for (Explosion explosion : explosions) {
-            drawExplosion(explosion, g);
+        iterator = explosions.iterator();
+        while (iterator.hasNext()) {
+            Explosion explosion = (Explosion) iterator.next();
+            if (!explosion.isAlive()) iterator.remove();
+            else drawExplosion(explosion, g);
         }
+        showInfo(g);
     }
 
     private void drawTank(Tank tank, Graphics g) {
-        if (!tank.isAlive()) {
-            if (tank.getIdentity() == Identity.ENEMY) operatingVector.remove(tank);
-            return;
-        }
-        int x = tank.getX();
-        int y = tank.getY();
-
+        Color color = null;
         //选择车体颜色
         switch (tank.getIdentity()) {
             case ALLY:
-                g.setColor(Color.GRAY);
+                color = Color.GRAY;
                 break;
             case ENEMY:
-                g.setColor(Color.ORANGE);
+                color = Color.ORANGE;
                 break;
         }
+
+        drawTank0(tank.getX(), tank.getY(), tank.getDirection(), color, Color.WHITE, g);
+    }
+
+    private void drawTank0(int x, int y, Direction direction, Color tankColor, Color weaponColor, Graphics g) {
         //绘制车体
-        switch (tank.getDirection()) {
+        g.setColor(tankColor);
+        switch (direction) {
             case UP:
             case DOWN:
                 g.fill3DRect(x, y, 15, 60, true);
@@ -102,11 +162,11 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
                 break;
         }
 
-        g.setColor(Color.WHITE);
+        g.setColor(weaponColor);
         //绘制圆形炮台
         g.fillOval(x + 20, y + 20, 20, 20);
         //绘制炮管
-        switch (tank.getDirection()) {
+        switch (direction) {
             case UP:
                 g.fillRect(x + 28, y, 4, 30);
                 break;
@@ -122,9 +182,6 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
     }
 
     private void drawBullet(Bullet bullet, Graphics g) {
-        if (!bullet.isAlive()) {
-            operatingVector.remove(bullet);
-        }
         switch (bullet.getIdentity()) {
             case ALLY:
                 g.setColor(Color.CYAN);
@@ -137,13 +194,17 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
     }
 
     private void drawExplosion(Explosion explosion, Graphics g) {
-        if (!explosion.isAlive()) {
-            explosions.remove(explosion);
-            return;
-        }
         g.drawImage(explosionImages[explosion.getLifeTime() / 3],
                 explosion.getX(), explosion.getY(),
                 Explosion.EXPLOSION_SIZE_X, Explosion.EXPLOSION_SIZE_Y, this);
+    }
+
+    public void showInfo(Graphics g) {
+        g.setColor(Color.BLACK);
+        g.setFont(new Font("宋体", Font.BOLD, 25));
+        g.drawString("累计击毁地方坦克", 1020, 30);
+        g.drawString("" + Recorder.instant().getRecord(), 1100, 100);
+        drawTank0(1020, 60, Direction.UP, Color.ORANGE, Color.CYAN, g);
     }
 
 
