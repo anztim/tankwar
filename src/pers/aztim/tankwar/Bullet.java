@@ -1,5 +1,6 @@
 package pers.aztim.tankwar;
 
+import java.io.Serializable;
 import java.util.Vector;
 
 public class Bullet extends MovableElement implements Runnable {
@@ -12,6 +13,10 @@ public class Bullet extends MovableElement implements Runnable {
         return allBullets;
     }
 
+    public static void addToAllBullets(Bullet bullet) {
+        allBullets.add(bullet);
+    }
+
     private final Identity identity;
     private final Tank host;
 
@@ -19,7 +24,7 @@ public class Bullet extends MovableElement implements Runnable {
         super(x, y, BULLET_SIZE_X, BULLET_SIZE_Y, direction, speed);
         this.identity = identity;
         this.host = host;
-        allBullets.add(this);
+        Bullet.addToAllBullets(this);
     }
 
     @Override

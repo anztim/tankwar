@@ -1,6 +1,8 @@
 package pers.aztim.tankwar;
 
-public abstract class Element {
+import java.io.Serializable;
+
+public abstract class Element  implements Serializable {
     private final int sizeX;
     private final int sizeY;
     private int x;

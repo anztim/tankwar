@@ -23,24 +23,71 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
     private final Vector<Bullet> allyBullets;
     private final Vector<Bullet> enemyBullets;
 
+    private boolean gameOver = false;
+
 
     private final int enemyNum = 6;
 
-    public GamePanel() {
+    public GamePanel(boolean recover) {
         players = new Vector<>();
-        players.add(new Player(470, 550));
-
         enemies = new Vector<>();
+
+        explosions = new Vector<>();
+        allyBullets = new Vector<>();
+        enemyBullets = new Vector<>();
+        if (!recover) newGame();
+    }
+
+    private void newGame() {
+        players.add(new Player(470, 550));
         for (int i = 0; i < enemyNum; i++) {
             enemies.add(new Enemy(50 + i * 100, 20));
         }
         for (Enemy enemy : enemies) {
             new Thread(enemy).start();
         }
+    }
 
-        explosions = new Vector<>();
-        allyBullets = new Vector<>();
-        enemyBullets = new Vector<>();
+    public void recover(Vector<? extends Tank> tanks, Vector<? extends Bullet> bullets) {
+        if (tanks != null) {
+            for (Tank tank : tanks) {
+                Tank.addToAllTanks(tank);
+                switch (tank.getIdentity()) {
+                    case ENEMY:
+                        enemies.add((Enemy) tank);
+                        break;
+                    case ALLY:
+                        players.add((Player) tank);
+                        break;
+                }
+            }
+        }
+        if (bullets != null) {
+            for (Bullet bullet : bullets) {
+                Bullet.addToAllBullets(bullet);
+                switch (bullet.getIdentity()) {
+                    case ENEMY:
+                        enemyBullets.add(bullet);
+                        break;
+                    case ALLY:
+                        allyBullets.add(bullet);
+                        break;
+                }
+            }
+        }
+        for (Enemy enemy : enemies) {
+            new Thread(enemy).start();
+        }
+        for (Bullet bullet : enemyBullets) {
+            new Thread(bullet).start();
+        }
+        for (Bullet bullet : allyBullets) {
+            new Thread(bullet).start();
+        }
+    }
+
+    public boolean isGameOver() {
+        return gameOver;
     }
 
     @Override
@@ -60,6 +107,7 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
             if (!tank.isAlive()) iterator.remove();
             else drawTank(tank, g);
         }
+        if (players.size() == 0) gameOver = true;
         iterator = enemyBullets.iterator();
         while (iterator.hasNext()) {
             Bullet bullet = (Bullet) iterator.next();
@@ -73,10 +121,10 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
             else drawBullet(bullet, g);
         }
         iterator = explosions.iterator();
-        while (iterator.hasNext()){
+        while (iterator.hasNext()) {
             Explosion explosion = (Explosion) iterator.next();
-            if(!explosion.isAlive()) iterator.remove();
-            else drawExplosion(explosion,g);
+            if (!explosion.isAlive()) iterator.remove();
+            else drawExplosion(explosion, g);
         }
         showInfo(g);
     }
@@ -93,10 +141,10 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
                 break;
         }
 
-        drawTank0(tank.getX(),tank.getY(),tank.getDirection(),color,Color.WHITE,g);
+        drawTank0(tank.getX(), tank.getY(), tank.getDirection(), color, Color.WHITE, g);
     }
 
-    private void drawTank0(int x,int y,Direction direction,Color tankColor, Color weaponColor,Graphics g){
+    private void drawTank0(int x, int y, Direction direction, Color tankColor, Color weaponColor, Graphics g) {
         //绘制车体
         g.setColor(tankColor);
         switch (direction) {
@@ -155,8 +203,8 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
         g.setColor(Color.BLACK);
         g.setFont(new Font("宋体", Font.BOLD, 25));
         g.drawString("累计击毁地方坦克", 1020, 30);
-        g.drawString(""+Recorder.instant().getRecord(),1100,100);
-        drawTank0(1020,60,Direction.UP,Color.ORANGE,Color.CYAN,g);
+        g.drawString("" + Recorder.instant().getRecord(), 1100, 100);
+        drawTank0(1020, 60, Direction.UP, Color.ORANGE, Color.CYAN, g);
     }
 
 

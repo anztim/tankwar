@@ -1,5 +1,6 @@
 package pers.aztim.tankwar;
 
+import java.io.Serializable;
 import java.util.Vector;
 
 public class Tank extends MovableElement {
@@ -7,7 +8,14 @@ public class Tank extends MovableElement {
     public static final int TANK_SIZE_Y = 60;
 
     private static final Vector<Tank> allTanks = new Vector<>();
-    public static Vector<Tank> getAllTanks() { return allTanks; }
+
+    public static Vector<Tank> getAllTanks() {
+        return allTanks;
+    }
+
+    public static void addToAllTanks(Tank tank) {
+        allTanks.add(tank);
+    }
 
     private static final TankMonitor TANK_MONITOR = TankMonitor.getTankMonitor();
 
@@ -16,10 +24,6 @@ public class Tank extends MovableElement {
 
         private TankMonitor() {
             new Thread(this).start();
-        }
-
-        public void add(Tank tank) {
-            allTanks.add(tank);
         }
 
         public static TankMonitor getTankMonitor() {
@@ -68,7 +72,7 @@ public class Tank extends MovableElement {
         bullets = new Vector<>();
         this.prevX = x;
         this.prevY = y;
-        TANK_MONITOR.add(this);
+        Tank.addToAllTanks(this);
     }
 
     @Override
