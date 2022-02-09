@@ -25,7 +25,6 @@ public class Bullet extends MovableElement implements Runnable {
             try {
                 this.stepForward();
             } catch (OutOfMap e) {
-                System.out.println(this + " touch " + e.direction + " at " + this.getX() + "," + this.getY());
                 this.kill();
             }
             try {

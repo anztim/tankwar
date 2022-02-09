@@ -14,7 +14,6 @@ public abstract class MovableElement extends Element {
         public OutOfMap(MovableElement element, Direction direction) {
             this.element = element;
             this.direction = direction;
-            System.out.println(element+ "touched "+direction +" edge");
         }
     }
 
