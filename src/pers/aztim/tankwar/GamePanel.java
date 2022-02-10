@@ -36,6 +36,7 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
         allyBullets = new Vector<>();
         enemyBullets = new Vector<>();
         if (!recover) newGame();
+        new AePlayWave("src\\111.wav").start();
     }
 
     private void newGame() {
